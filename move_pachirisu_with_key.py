@@ -45,7 +45,7 @@ def handle_events():
 while running:
     clear_canvas()
     tuk_ground.draw(TUK_WIDTH // 2, TUK_HEIGHT // 2)
-    character.clip_draw(frame * 100, 0, 80, 285, x, y)
+    character.clip_draw(frame * 100, 0, 100, 100, x, y, 150, 150)
 
     update_canvas()
     handle_events()
@@ -55,7 +55,7 @@ while running:
     frame = (frame + 1) % 16
     x += dir_x * 5  # x 방향 이동
     y += dir_y * 5 # y 방향 이동
-    delay(0.05)
+    delay(0.07)
 
     if not running:
         break
