@@ -12,8 +12,16 @@ character_left = load_image('run_pachirisu.png')
 character_up = load_image('run_pachirisu_up.png')
 character_down = load_image('run_pachirisu_down.png')
 
-#변수 초기화
+# IDLE 애니메이션
+character_idle = load_image('idle_pachirisu.png')
+
+# 변수 초기화
 character = character_right
+character = character_left
+character = character_up
+character = character_down
+character = character_idle
+
 
 running = True
 x = 100  # 초기 x 좌표
@@ -33,7 +41,7 @@ character_width = 100
 character_height = 100
 
 def handle_events():
-    global running, dir_x, dir_y, character  #전역 변수
+    global running, dir_x, dir_y, character, is_idle, idle_frame  # 전역 변수
     events = get_events()
     for event in events:
         if event.type == SDL_QUIT:
@@ -42,15 +50,19 @@ def handle_events():
             if event.key == SDLK_RIGHT:
                 dir_x += 1  # 오른쪽
                 character = character_right  # 오
+                is_idle = False
             elif event.key == SDLK_LEFT:
                 dir_x -= 1  # 왼쪽
                 character = character_left  # 왼
+                is_idle = False
             elif event.key == SDLK_UP:
                 dir_y += 1  # 위
                 character = character_up  # 위
+                is_idle = False
             elif event.key == SDLK_DOWN:
                 dir_y -= 1  # 아래
                 character = character_down  # 아래
+                is_idle = False
             elif event.key == SDLK_ESCAPE:
                 running = False
         elif event.type == SDL_KEYUP:
@@ -62,30 +74,50 @@ def handle_events():
                 dir_y -= 1
             elif event.key == SDLK_DOWN:
                 dir_y += 1
+# IDLE 애니메이션 변수 초기화
+is_idle = True
+idle_frame = 0
 
 while running:
     clear_canvas()
     tuk_ground.draw(TUK_WIDTH // 2, TUK_HEIGHT // 2)
 
-    # 왼쪽 이동: 캐릭터 이미지 좌우반전
-    if dir_x != 0:  # 이동 중일 때
-        if dir_x > 0:  # 오른쪽 이동
-            flip = False
-        else:  # 왼쪽 이동 (좌우 반전)
-            flip = True
-        prev_flip = flip
-    else:  # 이동 중이 아닐 때 이전 상태 유지
-        flip = prev_flip
+    if dir_x != 0 or dir_y != 0:
+        is_idle = False  # 이동 중일 때 IDLE 애니메이션 재생하지 않음
 
-    if flip:  # 좌우 반전 상태에 따라 이미지 그리기
-        character.clip_composite_draw(frame * 100, 0, 100, 160, 0, 'h', x, y, 120, 120)
+    # IDLE 애니메이션 재생 여부 확인
+    if is_idle:
+        character_idle.clip_draw(idle_frame * 100, 0, 100, 150, x, y, 100, 100)
+        idle_frame = (idle_frame + 1) % 32
+
     else:
-        character.clip_draw(frame * 100, 0, 100, 160, x, y, 120, 120)
+        # 왼쪽 이동: 캐릭터 이미지 좌우반전
+        if dir_x != 0:  # 이동 중일 때
+            if dir_x > 0:  # 오른쪽 이동
+                flip = False
+            else:  # 왼쪽 이동 (좌우 반전)
+                flip = True
+            prev_flip = flip
+        else:  # 이동 중이 아닐 때 이전 상태 유지
+            flip = prev_flip
+
+        if flip:  # 좌우 반전 상태에 따라 이미지 그리기
+            character.clip_composite_draw(frame * 100, 0, 100, 160, 0, 'h', x, y, 120, 120)
+        else:
+            character.clip_draw(frame * 100, 0, 100, 160, x, y, 120, 120)
+
+        # IDLE 상태로 전환
+        if dir_x == 0 and dir_y == 0:
+            is_idle = True
+            idle_frame = 0  # IDLE 애니메이션 프레임 초기화
 
     update_canvas()
     handle_events()
-    if not running:
-        break
+
+    # IDLE 상태로 전환
+    if dir_x == 0 and dir_y == 0:
+        is_idle = True
+        idle_frame = 0  # IDLE 애니메이션 프레임 초기화
 
     # x 방향
     if dir_x > 0:  # 오른쪽 이동
@@ -110,3 +142,4 @@ while running:
         break
 
 close_canvas()
+
