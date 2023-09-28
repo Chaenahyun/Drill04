@@ -8,12 +8,15 @@ tuk_ground = load_image('TUK_GROUND.png')
 character = load_image('run_pachirisu.png')
 
 running = True
-x = 1280 // 2  # 초기 x 좌표
-y = 1024 // 2  # 초기 y 좌표
+x = 100  # 초기 x 좌표
+y = 250  # 초기 y 좌표
 frame = 0  # 변수 초기화
 
 dir_x = 0  # x 방향 이동 변수
 dir_y = 0  # y 방향 이동 변수
+
+# 이전 좌우 반전 상태를 저장할 변수
+prev_flip = False
 
 # 화면 너비와 높이
 SCREEN_WIDTH = 1280
@@ -53,7 +56,21 @@ def handle_events():
 while running:
     clear_canvas()
     tuk_ground.draw(TUK_WIDTH // 2, TUK_HEIGHT // 2)
-    character.clip_draw(frame * 100, 0, 100, 100, x, y)
+
+    # 캐릭터 이미지를 좌우로 반전하여 그리기
+    if dir_x != 0:  # 이동 중일 때
+        if dir_x > 0:  # 오른쪽 이동
+            flip = False
+        else:  # 왼쪽 이동 (좌우 반전)
+            flip = True
+        prev_flip = flip
+    else:  # 이동 중이 아닐 때 이전 상태 유지
+        flip = prev_flip
+
+    if flip:  # 좌우 반전 상태에 따라 이미지 그리기
+        character.clip_composite_draw(frame * 100, 0, 100, 100, 0, 'h', x, y, 120, 120)
+    else:
+        character.clip_draw(frame * 100, 0, 100, 100, x, y, 120, 120)
 
     update_canvas()
     handle_events()
