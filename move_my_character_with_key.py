@@ -68,9 +68,9 @@ while running:
         flip = prev_flip
 
     if flip:  # 좌우 반전 상태에 따라 이미지 그리기
-        character.clip_composite_draw(frame * 100, 0, 100, 100, 0, 'h', x, y, 120, 120)
+        character.clip_composite_draw(frame * 100, 0, 100, 160, 0, 'h', x, y, 120, 120)
     else:
-        character.clip_draw(frame * 100, 0, 100, 110, x, y, 120, 120)
+        character.clip_draw(frame * 100, 0, 100, 160, x, y, 120, 120)
 
     update_canvas()
     handle_events()
@@ -93,7 +93,7 @@ while running:
         if y + dir_y * 5 - character_height // 2 >= 0:
             y += dir_y * 5
 
-    frame = (frame + 1) % 16
+    frame = (frame + 1) % 32
     delay(0.1)
 
     if not running:
